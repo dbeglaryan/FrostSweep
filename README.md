@@ -2,8 +2,6 @@
 
 A cross-platform file organizer that scans, categorizes, and moves files into organized folders. Built with React, Electron, and Python.
 
-![Intro](intro.png)
-
 ## Features
 
 - **Smart Scanning** — Scan any folder to discover file types, with optional subdirectory recursion
