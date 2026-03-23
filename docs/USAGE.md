@@ -1,4 +1,4 @@
-# Cryovault – Usage Guide
+# FrostSweep – Usage Guide
 
 ## 1) Select Source
 Choose the folder you want to organize. Optionally tick **Include Subdirectories**.
@@ -16,13 +16,13 @@ Define extensions (comma‑separated) and choose a **Destination Folder**.
 Click **Preview Organization** to export a CSV showing:
 - Current Path → Destination Path → Category
 
-Default filename: `cryovault_preview.csv`
+Default filename: `frostsweep_preview.csv`
 
 ## 5) Organize
 Click **Organize Files** to move items into their destinations.  
-A summary appears in the Activity panel. You can save the log CSV (default `cryovault_log.csv`).
+A summary appears in the Activity panel. You can save the log CSV (default `frostsweep_log.csv`).
 
 ## Tips
 - Duplicate filenames are auto‑de‑conflicted by appending `_1`, `_2`, etc.
-- Categories and destinations are saved in `cryovault_config.json`.
-- Application logs are written to `cryovault.log`.
+- Categories and destinations are saved in `frostsweep_config.json`.
+- Application logs are written to `frostsweep.log`.

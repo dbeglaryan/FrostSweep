@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Build output
+frontend/dist/
+electron/dist/
+backend/dist/
+release/
+dist/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# App data / runtime
+frostsweep.log
+frostsweep_config.json
+*.log
+recent_folders.json
+*.csv
+
+# Private developer docs
+private/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini

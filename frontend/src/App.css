@@ -1,0 +1,90 @@
+/* Utility button classes */
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-primary:hover { opacity: 0.85; }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-secondary {
+  background: var(--bg-input);
+  color: var(--text);
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-secondary:hover { opacity: 0.85; }
+.btn-secondary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-success {
+  background: var(--success);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-success:hover { opacity: 0.85; }
+.btn-success:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-warning {
+  background: var(--warning);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-warning:hover { opacity: 0.85; }
+.btn-warning:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-danger {
+  background: var(--danger);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-danger:hover { opacity: 0.85; }
+.btn-danger:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-accent {
+  background: var(--accent);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-accent:hover { opacity: 0.85; }
+
+.input-sm {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  outline: none;
+}

@@ -1,0 +1,51 @@
+{
+  "name": "frostsweep",
+  "version": "2.0.0",
+  "description": "Cross-platform file organizer with smart categorization, duplicate detection, and undo support",
+  "main": "electron/dist/main.js",
+  "author": "",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "dev:backend": "cd backend && python main.py --port 19542",
+    "dev:frontend": "cd frontend && npx vite",
+    "dev:electron": "npx tsc -p electron/tsconfig.json && npx electron .",
+    "build:frontend": "cd frontend && npx vite build",
+    "build:electron": "npx tsc -p electron/tsconfig.json",
+    "build": "npm run build:frontend && npm run build:electron",
+    "package": "npm run build && npx electron-builder",
+    "test:backend": "cd backend && python -m pytest tests/ -v"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0",
+    "typescript": "^5.6.0"
+  },
+  "build": {
+    "appId": "com.frostsweep.app",
+    "productName": "FrostSweep",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/dist/**/*",
+      "frontend/dist/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "backend/dist/",
+        "to": "backend/"
+      }
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "intro.png"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  }
+}
