@@ -1,15 +1,24 @@
 """File organization: matching, preview, organize, undo."""
 
+from __future__ import annotations
+
 import logging
 import os
 import shutil
 from datetime import datetime
+from typing import Any, Callable
+
+from .config import ConfigDict
 
 logger = logging.getLogger(__name__)
 
+ProgressCallback = Callable[[int, int, str], None] | None
 
-def match_category_and_destination(file_extension, config, categories):
-    destination = None
+
+def match_category_and_destination(
+    file_extension: str, config: ConfigDict, categories: list[str],
+) -> tuple[str | None, str]:
+    destination: str | None = None
     category_tag = "other_files"
     matched = False
     for category in categories:
@@ -38,7 +47,7 @@ def match_category_and_destination(file_extension, config, categories):
     return destination, category_tag
 
 
-def _resolve_dedup_path(destination, base_filename):
+def _resolve_dedup_path(destination: str, base_filename: str) -> str:
     new_path = os.path.join(destination, base_filename)
     if os.path.exists(new_path):
         root_name, ext = os.path.splitext(base_filename)
@@ -49,9 +58,14 @@ def _resolve_dedup_path(destination, base_filename):
     return new_path
 
 
-def build_preview(files, config, categories, dup_strategy="Rename"):
-    preview = []
-    seen_names = {}
+def build_preview(
+    files: list[str],
+    config: ConfigDict,
+    categories: list[str],
+    dup_strategy: str = "Rename",
+) -> list[dict[str, Any]]:
+    preview: list[dict[str, Any]] = []
+    seen_names: dict[str, int] = {}
     for fp in files:
         if not os.path.isfile(fp):
             continue
@@ -76,14 +90,20 @@ def build_preview(files, config, categories, dup_strategy="Rename"):
     return preview
 
 
-def organize_files(files, config, categories, dup_strategy="Rename",
-                   dry_run=False, progress_callback=None):
-    log_data = []
-    moves = []
+def organize_files(
+    files: list[str],
+    config: ConfigDict,
+    categories: list[str],
+    dup_strategy: str = "Rename",
+    dry_run: bool = False,
+    progress_callback: ProgressCallback = None,
+) -> dict[str, Any]:
+    log_data: list[dict[str, Any]] = []
+    moves: list[tuple[str, str]] = []
     only_files = [f for f in files if os.path.isfile(f)]
     total = len(only_files)
-    errors = []
-    seen_names = {}
+    errors: list[dict[str, str]] = []
+    seen_names: dict[str, int] = {}
 
     for i, fp in enumerate(only_files):
         base = os.path.basename(fp)
@@ -149,10 +169,10 @@ def organize_files(files, config, categories, dup_strategy="Rename",
     }
 
 
-def undo_moves(moves):
+def undo_moves(moves: list[tuple[str, str]]) -> dict[str, Any]:
     success = 0
     failed = 0
-    errors = []
+    errors: list[str] = []
     for original_path, new_path in reversed(moves):
         try:
             if os.path.exists(new_path):

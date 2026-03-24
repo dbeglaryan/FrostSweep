@@ -1,19 +1,22 @@
 """FrostSweep FastAPI backend — local HTTP API for file organization."""
 
+from __future__ import annotations
+
 import argparse
 import csv
 import io
 import logging
 import os
 import threading
+from typing import Any
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from core import config as cfg
 from core import duplicates, scanner
+from core.config import ConfigDict
 from core.filters import apply_filters
 from core.organizer import build_preview, organize_files, undo_moves
 
@@ -36,17 +39,17 @@ app.add_middleware(
 )
 
 # --- App state (guarded by lock) ---
-CONFIG_DIR = os.path.dirname(os.path.abspath(__file__))
-_config_path = os.path.join(CONFIG_DIR, 'frostsweep_config.json')
-_recent_path = os.path.join(CONFIG_DIR, 'recent_folders.json')
-_app_config = cfg.load_config(_config_path)
-_last_moves: list = []
-_last_log: list | None = None
-_recent_folders: list = cfg.load_recent_folders(_recent_path)
+CONFIG_DIR: str = os.path.dirname(os.path.abspath(__file__))
+_config_path: str = os.path.join(CONFIG_DIR, 'frostsweep_config.json')
+_recent_path: str = os.path.join(CONFIG_DIR, 'recent_folders.json')
+_app_config: ConfigDict = cfg.load_config(_config_path)
+_last_moves: list[tuple[str, str]] = []
+_last_log: list[dict[str, Any]] | None = None
+_recent_folders: list[str] = cfg.load_recent_folders(_recent_path)
 _state_lock = threading.Lock()
 
 
-def _categories():
+def _categories() -> list[str]:
     return cfg.get_categories(_app_config)
 
 
@@ -57,7 +60,7 @@ def _validate_folder(folder: str) -> str:
     if not os.path.isdir(resolved):
         raise HTTPException(400, "Invalid folder path")
     # Block system-critical paths
-    blocked = []
+    blocked: list[str] = []
     if os.name == 'nt':
         blocked = [os.environ.get('SYSTEMROOT', r'C:\Windows').lower(),
                    os.path.join(os.environ.get('SYSTEMROOT', r'C:\Windows'), 'System32').lower()]
@@ -79,7 +82,7 @@ def _validate_save_path(save_path: str) -> str:
         raise HTTPException(400, f"Parent directory does not exist: {parent}")
     ext = os.path.splitext(resolved)[1].lower()
     if ext not in ('.csv', '.json', '.txt', '.log'):
-        raise HTTPException(400, f"Export only supports .csv, .json, .txt, .log files")
+        raise HTTPException(400, "Export only supports .csv, .json, .txt, .log files")
     return resolved
 
 
@@ -122,17 +125,17 @@ class ExportLogRequest(BaseModel):
     save_path: str
 
 class ConfigUpdateRequest(BaseModel):
-    categories: list[dict] = []
+    categories: list[dict[str, Any]] = []
 
 
 # --- Endpoints ---
 @app.get("/api/health")
-def health():
+def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
 @app.get("/api/config")
-def get_config():
+def get_config() -> dict[str, Any]:
     with _state_lock:
         return {
             "config": _app_config,
@@ -141,7 +144,7 @@ def get_config():
 
 
 @app.put("/api/config")
-def update_config(req: ConfigUpdateRequest):
+def update_config(req: ConfigUpdateRequest) -> dict[str, Any]:
     global _app_config
     with _state_lock:
         if req.categories:
@@ -151,13 +154,13 @@ def update_config(req: ConfigUpdateRequest):
 
 
 @app.get("/api/recent-folders")
-def get_recent_folders():
+def get_recent_folders() -> dict[str, list[str]]:
     with _state_lock:
         return {"folders": _recent_folders}
 
 
 @app.post("/api/scan")
-def scan_directory(req: ScanRequest):
+def scan_directory(req: ScanRequest) -> dict[str, Any]:
     global _recent_folders
     folder = _validate_folder(req.folder)
     with _state_lock:
@@ -170,7 +173,7 @@ def scan_directory(req: ScanRequest):
 
 
 @app.post("/api/preview")
-def preview(req: PreviewRequest):
+def preview(req: PreviewRequest) -> dict[str, Any]:
     folder = _validate_folder(req.folder)
     files = scanner.iter_files(folder, req.recursive)
     files = apply_filters(
@@ -188,7 +191,7 @@ def preview(req: PreviewRequest):
 
 
 @app.post("/api/organize")
-def organize(req: OrganizeRequest):
+def organize(req: OrganizeRequest) -> dict[str, Any]:
     global _last_moves, _last_log
     folder = _validate_folder(req.folder)
     files = scanner.iter_files(folder, req.recursive)
@@ -214,7 +217,7 @@ def organize(req: OrganizeRequest):
 
 
 @app.post("/api/undo")
-def undo():
+def undo() -> dict[str, Any]:
     global _last_moves
     with _state_lock:
         if not _last_moves:
@@ -226,14 +229,14 @@ def undo():
 
 
 @app.post("/api/duplicates")
-def find_duplicates(req: DuplicatesRequest):
+def find_duplicates(req: DuplicatesRequest) -> dict[str, Any]:
     folder = _validate_folder(req.folder)
     files = scanner.iter_files(folder, req.recursive)
     return duplicates.detect_duplicates(files)
 
 
 @app.post("/api/categories")
-def add_category(req: AddCategoryRequest):
+def add_category(req: AddCategoryRequest) -> dict[str, Any]:
     global _app_config
     with _state_lock:
         _app_config, error = cfg.add_category(_app_config, req.name, req.extensions, req.destination)
@@ -244,7 +247,7 @@ def add_category(req: AddCategoryRequest):
 
 
 @app.delete("/api/categories/{name}")
-def delete_category(name: str):
+def delete_category(name: str) -> dict[str, Any]:
     global _app_config
     with _state_lock:
         _app_config, error = cfg.delete_category(_app_config, name)
@@ -255,7 +258,7 @@ def delete_category(name: str):
 
 
 @app.post("/api/export-log")
-def export_log(req: ExportLogRequest):
+def export_log(req: ExportLogRequest) -> dict[str, str]:
     with _state_lock:
         if _last_log is None or len(_last_log) == 0:
             raise HTTPException(400, "No log data to export")

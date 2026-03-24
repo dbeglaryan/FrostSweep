@@ -1,19 +1,27 @@
 """File filtering by size, date, and extension."""
 
+from __future__ import annotations
+
 import os
 from datetime import datetime
 
 
-def apply_filters(files, min_size_mb=None, max_size_mb=None,
-                  after_date=None, before_date=None,
-                  ext_whitelist=None, ext_blacklist=None):
+def apply_filters(
+    files: list[str],
+    min_size_mb: float | None = None,
+    max_size_mb: float | None = None,
+    after_date: str | None = None,
+    before_date: str | None = None,
+    ext_whitelist: list[str] | None = None,
+    ext_blacklist: list[str] | None = None,
+) -> list[str]:
     whitelist = _normalize_exts(ext_whitelist) if ext_whitelist else []
     blacklist = _normalize_exts(ext_blacklist) if ext_blacklist else []
 
     after_ts = _parse_date(after_date)
     before_ts = _parse_date(before_date)
 
-    filtered = []
+    filtered: list[str] = []
     for f in files:
         if not os.path.isfile(f):
             continue
@@ -48,8 +56,8 @@ def apply_filters(files, min_size_mb=None, max_size_mb=None,
     return filtered
 
 
-def _normalize_exts(exts):
-    result = []
+def _normalize_exts(exts: list[str]) -> list[str]:
+    result: list[str] = []
     for e in exts:
         e = e.strip().lower()
         if e:
@@ -57,7 +65,7 @@ def _normalize_exts(exts):
     return result
 
 
-def _parse_date(date_str):
+def _parse_date(date_str: str | None) -> float | None:
     if not date_str:
         return None
     try:

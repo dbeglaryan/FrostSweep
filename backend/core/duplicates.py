@@ -1,13 +1,16 @@
 """Duplicate file detection by name and content hash."""
 
+from __future__ import annotations
+
 import hashlib
 import logging
 import os
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
-def file_hash(filepath, block_size=65536):
+def file_hash(filepath: str, block_size: int = 65536) -> str | None:
     try:
         h = hashlib.md5()
         with open(filepath, 'rb') as f:
@@ -22,16 +25,16 @@ def file_hash(filepath, block_size=65536):
         return None
 
 
-def detect_duplicates(files):
+def detect_duplicates(files: list[str]) -> dict[str, Any]:
     only_files = [f for f in files if os.path.isfile(f)]
 
-    by_name = {}
+    by_name: dict[str, list[str]] = {}
     for f in only_files:
         name = os.path.basename(f)
         by_name.setdefault(name, []).append(f)
     name_dupes = {k: v for k, v in by_name.items() if len(v) > 1}
 
-    by_hash = {}
+    by_hash: dict[str, list[str]] = {}
     for f in only_files:
         h = file_hash(f)
         if h:

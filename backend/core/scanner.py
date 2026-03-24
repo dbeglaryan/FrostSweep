@@ -1,11 +1,16 @@
 """File scanning, extension detection, and statistics."""
 
+from __future__ import annotations
+
 import glob
 import os
+from typing import Any
+
+from .config import ConfigDict
 
 
-def iter_files(folder, recursive=False):
-    files = []
+def iter_files(folder: str, recursive: bool = False) -> list[str]:
+    files: list[str] = []
     if recursive:
         for root_dir, _, filenames in os.walk(folder):
             files.extend(os.path.join(root_dir, f) for f in filenames)
@@ -14,8 +19,8 @@ def iter_files(folder, recursive=False):
     return files
 
 
-def scan_extensions(files):
-    extensions = set()
+def scan_extensions(files: list[str]) -> list[str]:
+    extensions: set[str] = set()
     for fp in files:
         if os.path.isfile(fp):
             ext = os.path.splitext(fp)[1].lower()
@@ -24,14 +29,16 @@ def scan_extensions(files):
     return sorted(extensions)
 
 
-def compute_scan_stats(files, config, categories):
+def compute_scan_stats(
+    files: list[str], config: ConfigDict, categories: list[str],
+) -> dict[str, Any]:
     from .organizer import match_category_and_destination
 
     file_list = [f for f in files if os.path.isfile(f)]
     total_count = len(file_list)
     total_size = 0
-    breakdown = {}
-    sizes = []
+    breakdown: dict[str, dict[str, Any]] = {}
+    sizes: list[dict[str, Any]] = []
 
     for f in file_list:
         try:

@@ -1,12 +1,17 @@
 """Configuration management: load/save config, categories, recent folders."""
 
+from __future__ import annotations
+
 import json
 import logging
 import os
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_CONFIG = {
+ConfigDict = dict[str, Any]
+
+DEFAULT_CONFIG: ConfigDict = {
     'documents': ['.pdf', '.docx', '.doc', '.txt'],
     'image': ['.jpeg', '.jpg', '.webp', '.svg', '.png'],
     'music': ['.mp3'],
@@ -24,11 +29,11 @@ DEFAULT_CONFIG = {
 }
 
 
-def get_default_config():
+def get_default_config() -> ConfigDict:
     return dict(DEFAULT_CONFIG)
 
 
-def load_config(config_path):
+def load_config(config_path: str) -> ConfigDict:
     config = get_default_config()
     try:
         if os.path.exists(config_path):
@@ -40,7 +45,7 @@ def load_config(config_path):
     return config
 
 
-def save_config(config_path, config):
+def save_config(config_path: str, config: ConfigDict) -> None:
     try:
         with open(config_path, 'w') as f:
             json.dump(config, f, indent=4)
@@ -48,14 +53,19 @@ def save_config(config_path, config):
         logger.error(f"Failed to save config: {e}")
 
 
-def get_categories(config):
+def get_categories(config: ConfigDict) -> list[str]:
     categories = [k for k, v in config.items() if isinstance(v, list)]
     if 'other_files' not in categories:
         categories.append('other_files')
     return categories
 
 
-def add_category(config, name, extensions, destination=None):
+def add_category(
+    config: ConfigDict,
+    name: str,
+    extensions: list[str],
+    destination: str | None = None,
+) -> tuple[ConfigDict, str | None]:
     raw = name.strip()
     if not raw:
         return config, "Please enter a category name."
@@ -73,7 +83,9 @@ def add_category(config, name, extensions, destination=None):
     return config, None
 
 
-def delete_category(config, name):
+def delete_category(
+    config: ConfigDict, name: str,
+) -> tuple[ConfigDict, str | None]:
     if name == 'other_files':
         return config, "Cannot delete the catch-all category."
     config.pop(name, None)
@@ -81,11 +93,14 @@ def delete_category(config, name):
     return config, None
 
 
-def update_config_from_categories(category_data, existing_config=None):
+def update_config_from_categories(
+    category_data: list[dict[str, Any]],
+    existing_config: ConfigDict | None = None,
+) -> ConfigDict:
     """Merge category data into existing config (or build fresh if none provided).
     Each dict: {name, extensions: list[str], destination: str}
     """
-    new_cfg = dict(existing_config) if existing_config else {}
+    new_cfg: ConfigDict = dict(existing_config) if existing_config else {}
     # Remove old category keys that aren't in the new data
     new_names = {cat['name'] for cat in category_data}
     old_categories = [k for k, v in new_cfg.items() if isinstance(v, list)]
@@ -106,7 +121,7 @@ def update_config_from_categories(category_data, existing_config=None):
     return new_cfg
 
 
-def load_recent_folders(path):
+def load_recent_folders(path: str) -> list[str]:
     try:
         if os.path.exists(path):
             with open(path, 'r') as f:
@@ -119,7 +134,9 @@ def load_recent_folders(path):
         return []
 
 
-def save_recent_folder(path, folder, current):
+def save_recent_folder(
+    path: str, folder: str, current: list[str],
+) -> list[str]:
     folders = list(current)
     if folder in folders:
         folders.remove(folder)
