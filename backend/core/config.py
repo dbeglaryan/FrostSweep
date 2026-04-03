@@ -12,12 +12,12 @@ logger = logging.getLogger(__name__)
 ConfigDict = dict[str, Any]
 
 DEFAULT_CONFIG: ConfigDict = {
-    'documents': ['.pdf', '.docx', '.doc', '.txt'],
-    'image': ['.jpeg', '.jpg', '.webp', '.svg', '.png'],
-    'music': ['.mp3'],
-    'video': ['.mp4'],
-    'setup_files': ['.exe', '.msi'],
-    'compressed_files': ['.zip'],
+    'documents': ['.pdf', '.docx', '.doc', '.txt', '.xlsx', '.pptx', '.csv'],
+    'image': ['.jpeg', '.jpg', '.webp', '.svg', '.png', '.gif', '.bmp', '.tiff'],
+    'music': ['.mp3', '.wav', '.flac', '.aac', '.ogg'],
+    'video': ['.mp4', '.mov', '.avi', '.mkv', '.wmv'],
+    'setup_files': ['.exe', '.msi', '.dmg', '.deb', '.rpm'],
+    'compressed_files': ['.zip', '.rar', '.7z', '.tar', '.gz'],
     'other_files': ['.psd', '.ai', '.eps'],
     'documents_location': os.path.expanduser("~/Downloads/PDF"),
     'image_location': os.path.expanduser("~/Downloads/Image"),
