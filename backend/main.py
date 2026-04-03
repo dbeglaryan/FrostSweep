@@ -68,9 +68,10 @@ def _validate_folder(folder: str) -> str:
         blocked = ['/bin', '/sbin', '/usr/bin', '/usr/sbin', '/etc', '/boot', '/proc', '/sys']
     resolved_lower = resolved.replace('\\', '/').lower().rstrip('/')
     for b in blocked:
-        b_norm = b.replace('\\', '/').lower().rstrip('/')
-        if resolved_lower == b_norm or resolved_lower.startswith(b_norm + '/'):
-            raise HTTPException(403, f"Access to system directory '{resolved}' is blocked")
+        for b_variant in {b, os.path.realpath(b)}:
+            b_norm = b_variant.replace('\\', '/').lower().rstrip('/')
+            if resolved_lower == b_norm or resolved_lower.startswith(b_norm + '/'):
+                raise HTTPException(403, f"Access to system directory '{resolved}' is blocked")
     return resolved
 
 
