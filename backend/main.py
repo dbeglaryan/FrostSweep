@@ -81,7 +81,7 @@ def _validate_save_path(save_path: str) -> str:
     if not os.path.isdir(parent):
         raise HTTPException(400, f"Parent directory does not exist: {parent}")
     ext = os.path.splitext(resolved)[1].lower()
-    if ext not in ('.csv', '.json', '.txt', '.log'):
+    if ext not in ('.csv', '.json', '.txt', '.log', '.xlsx'):
         raise HTTPException(400, "Export only supports .csv, .json, .txt, .log files")
     return resolved
 
@@ -131,7 +131,7 @@ class ConfigUpdateRequest(BaseModel):
 # --- Endpoints ---
 @app.get("/api/health")
 def health() -> dict[str, str]:
-    return {"status": "ok"}
+    return {"status": "ok", "version": app.version}
 
 
 @app.get("/api/config")
@@ -166,8 +166,8 @@ def scan_directory(req: ScanRequest) -> dict[str, Any]:
     with _state_lock:
         _recent_folders = cfg.save_recent_folder(_recent_path, folder, _recent_folders)
     files = scanner.iter_files(folder, req.recursive)
+    extensions = scanner.scan_extensions(files)
     with _state_lock:
-        extensions = scanner.scan_extensions(files)
         stats = scanner.compute_scan_stats(files, _app_config, _categories())
     return {"extensions": extensions, "stats": stats}
 

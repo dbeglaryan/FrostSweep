@@ -15,7 +15,7 @@ def iter_files(folder: str, recursive: bool = False) -> list[str]:
         for root_dir, _, filenames in os.walk(folder):
             files.extend(os.path.join(root_dir, f) for f in filenames)
     else:
-        files = glob.glob(os.path.join(folder, '*'))
+        files = [p for p in glob.glob(os.path.join(folder, '*')) if os.path.isfile(p)]
     return files
 
 
